@@ -30,19 +30,19 @@ import upytest
 
 expected_results = {
     "result_all": {
-        "passes": 11,
-        "fails": 9,
-        "skipped": 6,
+        "passes": 14,
+        "fails": 12,
+        "skipped": 8,
     },
     "result_random": {
-        "passes": 11,
-        "fails": 9,
-        "skipped": 6,
+        "passes": 14,
+        "fails": 12,
+        "skipped": 8,
     },
     "result_module": {
-        "passes": 10,
-        "fails": 9,
-        "skipped": 6,
+        "passes": 13,
+        "fails": 12,
+        "skipped": 8,
     },
     "result_class": {
         "passes": 3,

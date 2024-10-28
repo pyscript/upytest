@@ -96,37 +96,37 @@ class TestClass:
     """
 
     @upytest.skip("This test will be skipped")
-    def test_skipped(self):
+    def test_in_class_skipped(self):
         assert False  # This will not be executed.
 
     @upytest.skip(
         "This test will be skipped with a skip_when condition", skip_when=True
     )
-    def test_when_skipped(self):
+    def test_in_class_when_skipped(self):
         assert False  # This will not be executed.
 
     @upytest.skip(
         "This test will NOT be skipped with a False-y skip_when",
         skip_when=False,
     )
-    def test_when_not_skipped_passes(self):
+    def test_in_class_when_not_skipped_passes(self):
         assert True, "This test passes"
 
-    def test_passes(self):
+    def test_in_class_passes(self):
         assert True, "This test passes"
 
-    def test_fails(self):
+    def test_in_class_fails(self):
         assert False, "This test will fail"
 
-    def test_raises_exception_passes(self):
+    def test_in_class_raises_exception_passes(self):
         with upytest.raises(ValueError):
             raise ValueError("This is a ValueError")
 
-    def test_does_not_raise_exception_fails(self):
+    def test_in_class_does_not_raise_exception_fails(self):
         with upytest.raises(ValueError):
             pass
 
-    def test_does_not_raise_expected_exception_fails(self):
+    def test_in_class_does_not_raise_expected_exception_fails(self):
         with upytest.raises(ValueError, AssertionError):
             raise TypeError("This is a TypeError")
 
@@ -175,3 +175,44 @@ async def test_async_does_not_raise_exception_fails():
 async def test_async_does_not_raise_expected_exception_fails():
     with upytest.raises(ValueError, AssertionError):
         raise TypeError("This is a TypeError")
+
+
+class TestAsyncClass:
+    """
+    An asynchronous class based version of the above tests.
+    """
+
+    @upytest.skip("This test will be skipped")
+    async def test_async_in_class_skipped(self):
+        assert False  # This will not be executed.
+
+    @upytest.skip(
+        "This test will be skipped with a skip_when condition", skip_when=True
+    )
+    async def test_async_in_class_when_skipped(self):
+        assert False  # This will not be executed.
+
+    @upytest.skip(
+        "This test will NOT be skipped with a False-y skip_when",
+        skip_when=False,
+    )
+    async def test_async_in_class_when_not_skipped_passes(self):
+        assert True, "This test passes"
+
+    async def test_async_in_class_passes(self):
+        assert True, "This test passes"
+
+    async def test_async_in_class_fails(self):
+        assert False, "This test will fail"
+
+    async def test_async_in_class_raises_exception_passes(self):
+        with upytest.raises(ValueError):
+            raise ValueError("This is a ValueError")
+
+    async def test_async_in_class_does_not_raise_exception_fails(self):
+        with upytest.raises(ValueError):
+            pass
+
+    async def test_async_in_class_does_not_raise_expected_exception_fails(self):
+        with upytest.raises(ValueError, AssertionError):
+            raise TypeError("This is a TypeError")

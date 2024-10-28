@@ -123,23 +123,23 @@ def parse_traceback_from_exception(ex):
 
 def shuffle(a_list):
     """
-    Shuffle a list, in place. 
-    
+    Shuffle a list, in place.
+
     This function is needed because MicroPython does not have a random.shuffle
     function.
 
     It falls back to random.shuffle if using CPython, otherwise it uses a
     simple implementation of the Fisher-Yates in-place shuffle algorithm.
 
-    Context: 
-    
+    Context:
+
     https://stackoverflow.com/questions/73143243/are-there-any-alternatives-for-the-python-module-randoms-shuffle-function-in
     """
     if hasattr(random, "shuffle"):
         random.shuffle(a_list)
     else:
         for i in range(len(a_list) - 1, 0, -1):
-            j = random.randrange(i+1)
+            j = random.randrange(i + 1)
             a_list[i], a_list[j] = a_list[j], a_list[i]
 
 
@@ -230,8 +230,20 @@ class TestModule:
                     for method_name, method in item.__dict__.items():
                         if callable(method) or is_awaitable(method):
                             if method_name.startswith("test"):
+                                if is_awaitable(method):
+
+                                    async def method_wrapper(
+                                        instance=instance,
+                                        method_name=method_name,
+                                    ):
+                                        await getattr(instance, method_name)()
+
+                                else:
+                                    method_wrapper = getattr(
+                                        instance, method_name
+                                    )
                                 t = TestCase(
-                                    getattr(instance, method_name),
+                                    method_wrapper,
                                     self.path,
                                     f"{name}.{method_name}",
                                     id(method),
