@@ -4,6 +4,9 @@
         "./tests/__init__.py": "tests/__init__.py",
         "./tests/conftest.py": "tests/conftest.py",
         "./tests/test_core_functionality.py": "tests/test_core_functionality.py",
-        "./tests/test_with_setup_teardown.py": "tests/test_with_setup_teardown.py"
+        "./tests/test_with_setup_teardown.py": "tests/test_with_setup_teardown.py",
+        "./tests/inner_tests/__init__.py": "tests/inner_tests/__init__.py",
+        "./tests/inner_tests/test_inner.py": "tests/inner_tests/test_inner.py",
+        "./tests/inner_tests/conftest.py": "tests/inner_tests/conftest.py"
     }
 }

@@ -349,7 +349,7 @@ def gather_conftest_functions(conftest_path, target):
     conftest_path = str(conftest_path)
     if os.path.exists(conftest_path):
         print(
-            f"Using \033[1m{conftest_path}\033[0m for global setup and teardown in \033[1m{target}\033[0m."
+            f"Using \033[1m{conftest_path}\033[0m for setup and teardown for tests in \033[1m{target}\033[0m."
         )
         conftest = import_module(conftest_path)
         setup = conftest.setup if hasattr(conftest, "setup") else None
@@ -378,11 +378,20 @@ def discover(targets, pattern, setup=None, teardown=None):
     setup and teardown functions can be overridden in the individual test
     modules.
     """
+    # To contain the various conftest.py modules for subdirectories. The key
+    # will be the directory path, and the value will be a tuple containing the
+    # setup and teardown functions.
+    conftests = {}
+    # To contain the TestModule instances.
     result = []
     for target in targets:
         if "::" in target:
             conftest_path = Path(target.split("::")[0]).parent / "conftest.py"
-            setup, teardown = gather_conftest_functions(conftest_path, target)
+            if str(conftest_path) not in conftests:
+                conftests[str(conftest_path)] = gather_conftest_functions(
+                    conftest_path, target
+                )
+            setup, teardown = conftests[str(conftest_path)]
             module_path, test_names = target.split("::")
             module_instance = import_module(module_path)
             module = TestModule(module_path, module_instance, setup, teardown)
@@ -390,12 +399,36 @@ def discover(targets, pattern, setup=None, teardown=None):
             result.append(module)
         elif os.path.isdir(target):
             conftest_path = Path(target) / "conftest.py"
-            setup, teardown = gather_conftest_functions(conftest_path, target)
+            if str(conftest_path) not in conftests:
+                conftests[str(conftest_path)] = gather_conftest_functions(
+                    conftest_path, target
+                )
+            setup, teardown = conftests[str(conftest_path)]
             for module_path in Path(target).rglob(pattern):
                 module_instance = import_module(module_path)
-                module = TestModule(
-                    module_path, module_instance, setup, teardown
-                )
+                parent_dir = "/".join(str(module_path).split("/")[:-1])
+                if parent_dir != target:
+                    # This is a module in a subdirectory of the target
+                    # directory, so ensure any conftest.py in the sub directory
+                    # is imported for setup and teardown.
+                    conftest_path = Path(parent_dir) / "conftest.py"
+                    if str(conftest_path) not in conftests:
+                        conftests[str(conftest_path)] = (
+                            gather_conftest_functions(
+                                conftest_path, parent_dir
+                            )
+                        )
+                    local_setup, local_teardown = conftests[str(conftest_path)]
+                    module = TestModule(
+                        module_path,
+                        module_instance,
+                        local_setup,
+                        local_teardown,
+                    )
+                else:
+                    module = TestModule(
+                        module_path, module_instance, setup, teardown
+                    )
                 result.append(module)
         else:
             conftest_path = Path(target).parent / "conftest.py"
