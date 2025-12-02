@@ -80,8 +80,12 @@ def is_awaitable(obj):
     if is_micropython:
         # MicroPython doesn't appear to have a way to determine if a closure is
         # an async function except via the repr. This is a bit hacky.
-        if "<closure <generator>" in repr(obj):
+        r = repr(obj)
+        if "<closure <generator>" in r:
             return True
+        # Same applies to bound methods.
+        if "<bound_method" in r and "<generator>" in r:
+            return True 
         return inspect.isgeneratorfunction(obj)
 
     return inspect.iscoroutinefunction(obj)
